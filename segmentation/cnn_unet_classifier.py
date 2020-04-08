@@ -4,17 +4,25 @@ from keras.layers import Conv2D, MaxPooling2D
 
 from keras_segmentation.predict import predict_multiple
 from keras_segmentation.train import find_latest_checkpoint
+from glob import glob
+import os
 
-TRAIN = True
-LOAD = False
+def splitfn(fn):
+    path, fn = os.path.split(fn)
+    name, ext = os.path.splitext(fn)
+    return path, name, ext
+
+TRAIN = False
+LOAD = True
 input_height,input_width = 64,64
 n_classes = 3
 epochs = 5
+ckpath = "checkpoints/unet"
 
 from keras_segmentation.models.unet import unet
 model = unet(n_classes=3 ,  input_height=64, input_width=64  )
 
-ckpath = "checkpoints/unet"
+
 
 if LOAD:
     latest_weights = find_latest_checkpoint(ckpath)
@@ -38,10 +46,26 @@ if not TRAIN:
     latest_weights = find_latest_checkpoint(ckpath)
     model.load_weights(latest_weights)
 
+inp_dir="./12ply/"
+out_dir="./outputs/"
+regex = inp_dir + "adept12ply_raw_*.png"
+imgpaths = sorted(glob(regex))
+
+for p in imgpaths:
+    folder,name,ext = splitfn(p)
+    out = model.predict_segmentation(
+        inp=p,
+        out_fname=out_dir+name+ext,
+        colors=[(0,0,255),(0,255,0),(255,0,0)]
+    )
+    lname = name.split('_')
+    if lname[-1]=='0' and lname[-2]=='0':
+        print(name)
+
 ##predict_multiple(
 ##        model=model,
 ##	checkpoints_path=ckpath, 
-##	inp_dir="./val_frames/", 
+##	inp_dir="./12ply/", 
 ##	out_dir="outputs/",
 ##        colors=[(0,0,255),(0,255,0),(255,0,0)]
 ##)
