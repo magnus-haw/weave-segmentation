@@ -1,0 +1,7 @@
+# mask error locations (row,col)
+183,1011
+419,1011
+214,534
+405,448
+
+
