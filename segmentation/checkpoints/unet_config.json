@@ -1,1 +1,1 @@
-{"model_class": "unet", "n_classes": 3, "input_height": 64, "input_width": 64, "output_height": 32, "output_width": 32}
+{"model_class": "unet", "n_classes": 3, "input_height": 128, "input_width": 128, "output_height": 64, "output_width": 64}

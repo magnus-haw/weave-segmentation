@@ -14,7 +14,7 @@ imgpaths = sorted(glob(imgRegx))
 maskpaths = sorted(glob(maskRegx))
 metapaths = sorted(glob(metaRegx))
 
-sqshape = 64
+sqshape = 128
 
 def splitfn(fn):
     path, fn = os.path.split(fn)

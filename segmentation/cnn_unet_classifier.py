@@ -14,14 +14,14 @@ def splitfn(fn):
 
 TRAIN = False
 LOAD = True
-input_height,input_width = 64,64
+APPLY = True
+input_height,input_width = 128,128
 n_classes = 3
 epochs = 5
 ckpath = "checkpoints/unet"
 
 from keras_segmentation.models.unet import unet
-model = unet(n_classes=3 ,  input_height=64, input_width=64  )
-
+model = unet(n_classes=3, input_height=input_height, input_width=input_width)
 
 
 if LOAD:
@@ -48,16 +48,17 @@ regex = inp_dir + "adept12ply_raw_????_?_?.png"
 imgpaths = sorted(glob(regex))
 
 ### Apply network to target imgs
-for p in imgpaths:
-    folder,name,ext = splitfn(p)
-    out = model.predict_segmentation(
-        inp=p,
-        out_fname=out_dir+name+ext,
-        colors=[(0,0,255),(0,255,0),(255,0,0)]
-    )
-    lname = name.split('_')
-    if lname[-1]=='0' and lname[-2]=='0':
-        print(name)
+if APPLY:
+    for p in imgpaths:
+        folder,name,ext = splitfn(p)
+        out = model.predict_segmentation(
+            inp=p,
+            out_fname=out_dir+name+ext,
+            colors=[(0,0,255),(0,255,0),(255,0,0)]
+        )
+        lname = name.split('_')
+        if lname[-1]=='0' and lname[-2]=='0':
+            print(name)
 
 ##predict_multiple(
 ##        model=model,

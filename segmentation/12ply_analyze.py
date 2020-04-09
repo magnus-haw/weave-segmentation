@@ -1,17 +1,17 @@
 import cv2 as cv
 from skimage import io
 import numpy as np
-import os
+import os, imageio
 import matplotlib.pyplot as plt
 from glob import glob
 
 folder = "./ADEPT/"
 imgRegx = folder + "adept12ply_raw.tif"
 imgpaths = sorted(glob(imgRegx))
-MAKE_TRAINING_SET = False
-REASSEMBLE_OUTPUT = True
+MAKE_TEST_SET = True
+REASSEMBLE_OUTPUT = False
 SHOW_OVERLAY = False
-sqshape = 64
+sqshape = 128
 
 def splitfn(fn):
     path, fn = os.path.split(fn)
@@ -71,7 +71,7 @@ ply = 12
 im = io.imread(imgpaths[0])
 nframes,h,w = im.shape
 
-if MAKE_TRAINING_SET:
+if MAKE_TEST_SET:
 
     ### Load metadata
     toppad,bottompad,leftpad,rightpad = 0,0,0,0
@@ -97,7 +97,7 @@ if MAKE_TRAINING_SET:
                 ### excise subimage
                 imsq = imcrop[row:row+sqshape,col:col+sqshape,:]
 
-                ### save subimages to training and validation folders
+                ### save subimages
                 imfolder = './12ply'
                 cv.imwrite(imfolder+'/'+name+'_{:04d}_{}_{}'.format(n,j,k)+'.png',imsq)
                 
@@ -108,7 +108,7 @@ if REASSEMBLE_OUTPUT:
     for s in range(1,nframes-1):
         regex = in_dir + "adept12ply_raw_{:04d}_*.png".format(s)
         imgpaths = sorted(glob(regex))
-        shsq,imshape = (64,64,3),(300,375,3)
+        shsq,imshape = (sqshape,sqshape,3),(h,w,3)
         
         ret = reassemble(regex,shsq,imshape)
         gray = grayMask(ret)
@@ -124,3 +124,5 @@ if REASSEMBLE_OUTPUT:
             plt.title("cnn_12ply_{}".format(s))
             plt.imshow(dst)
             plt.show()
+            
+    imageio.mimwrite('adept12ply_labels.tiff',labels)
