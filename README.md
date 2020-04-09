@@ -2,7 +2,8 @@
 segmentation of woven materials
 
 ## Python environment:
-Defined in conda-env.txt. To clone the environment use: 
+Python 3.7 using openCV 4.2.0, Keras 2.3.1, numpy 1.18, and TensorFlow 2.1
+Full conda environment defined in conda-env.txt. To clone the environment use: 
 ```
 conda create --name cnn --file conda-env.txt
 ```
