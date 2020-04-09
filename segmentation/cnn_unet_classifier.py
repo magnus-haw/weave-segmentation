@@ -42,15 +42,12 @@ if TRAIN:
 ##    out_fname="test_output.png"
 ##)
 
-if not TRAIN:
-    latest_weights = find_latest_checkpoint(ckpath)
-    model.load_weights(latest_weights)
-
 inp_dir="./12ply/"
 out_dir="./outputs/"
-regex = inp_dir + "adept12ply_raw_*.png"
+regex = inp_dir + "adept12ply_raw_????_?_?.png"
 imgpaths = sorted(glob(regex))
 
+### Apply network to target imgs
 for p in imgpaths:
     folder,name,ext = splitfn(p)
     out = model.predict_segmentation(
