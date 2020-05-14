@@ -5,9 +5,21 @@ from keras.layers import Conv2D, MaxPooling2D
 from keras_segmentation.predict import predict_multiple
 from keras_segmentation.train import find_latest_checkpoint
 
+
 TRAIN = 1
 LOAD = 1
-input_height,input_width = 64,64
+APPLY = 1
+if (APPLY == 1) and (TRAIN == 0):
+    img = cv2.imread("frame_0012.png")
+    height = img.shape[0]
+    width= img.shape[1]
+    pix = max(width, height)- (max(width, height) % 4)
+    input_height,input_width = pix, pix
+    print(input_width)
+    print(input_height)
+else:
+    input_height,input_width = 64,64
+
 n_classes = 3
 epochs= 2
 ckpath = "checkpoints/mycnn2"
@@ -50,7 +62,7 @@ if LOAD:
     model.load_weights(latest_weights)
 
 if TRAIN:
-    model.train( 
+    model.train(
         train_images =  "./train_frames/",
         train_annotations = "./train_masks/",
         checkpoints_path = ckpath , epochs=epochs,
@@ -62,11 +74,11 @@ if TRAIN:
 ##    inp="./val_frames/ms_8ply_0000_0_10.png",
 ##    out_fname="test_output.png"
 ##)
-
-predict_multiple(
-        model=model,
-	checkpoints_path=ckpath, 
-	inp_dir="./12ply/", 
-	out_dir="outputs/",
-        colors=[(0,0,255),(0,255,0),(255,0,0)]
-)
+if APPLY.
+    predict_multiple(
+            model=model,
+    	checkpoints_path=ckpath,
+    	inp_dir="./12ply/",
+    	out_dir="outputs/",
+            colors=[(0,0,255),(0,255,0),(255,0,0)]
+    )
