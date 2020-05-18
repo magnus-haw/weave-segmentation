@@ -8,10 +8,9 @@ from glob import glob
 folder = "./ADEPT/"
 imgRegx = folder + "adept12ply_raw.tif"
 imgpaths = sorted(glob(imgRegx))
-MAKE_TEST_SET = True
-REASSEMBLE_OUTPUT = False
+MAKE_TEST_SET = False
+REASSEMBLE_OUTPUT = True
 SHOW_OVERLAY = False
-sqshape = 128
 
 def splitfn(fn):
     path, fn = os.path.split(fn)
@@ -74,7 +73,7 @@ nframes,h,w = im.shape
 if MAKE_TEST_SET:
 
     ### Load metadata
-    toppad,bottompad,leftpad,rightpad = 0,0,0,0
+    toppad,bottompad,leftpad,rightpad = 4,0,0,9
 
     ### Loop over images
     for n in range(1,nframes-1):
@@ -83,35 +82,27 @@ if MAKE_TEST_SET:
         imcrop = im[n-1:n+2,:,:]
         imcrop = np.moveaxis(imcrop, 0, -1)
         hc,wc,c= imcrop.shape
+        
+        full = np.zeros((304,384,3))
+        full[:hc,:wc,:] = imcrop
+        #print(full.shape)
+        #print(magnus)
 
         ### Split images into smaller sq images
-        rows,cols = int(hc/sqshape), int(wc/sqshape)
-        for j in range(0,rows+1):
-            row = j*sqshape
-            if j == rows:
-                row = hc - sqshape
-            for k in range(0,cols+1):
-                col = k*sqshape
-                if k == cols:
-                    col = wc - sqshape
-                ### excise subimage
-                imsq = imcrop[row:row+sqshape,col:col+sqshape,:]
-
-                ### save subimages
-                imfolder = './12ply'
-                cv.imwrite(imfolder+'/'+name+'_{:04d}_{}_{}'.format(n,j,k)+'.png',imsq)
+        imfolder = './12ply'
+        cv.imwrite(imfolder+'/'+name+'_{:04d}'.format(n)+'.png',full)
                 
 if REASSEMBLE_OUTPUT:
     in_dir="./outputs/"
     labels = im.copy()*0
 
     for s in range(1,nframes-1):
-        regex = in_dir + "adept12ply_raw_{:04d}_*.png".format(s)
+        regex = in_dir + "adept12ply_raw_{:04d}.png".format(s)
         imgpaths = sorted(glob(regex))
-        shsq,imshape = (sqshape,sqshape,3),(h,w,3)
         
-        ret = reassemble(regex,shsq,imshape)
-        gray = grayMask(ret)
+        ret = cv.imread(imgpaths[0],1)
+        image  = ret[:300,:375]
+        gray = grayMask(image)
         labels[s,:,:] = gray
         
         cv.imwrite("./12ply_segmented/cnn_12ply_{:04d}.png".format(s),ret)
@@ -120,7 +111,7 @@ if REASSEMBLE_OUTPUT:
             ### crop image to mask size
             imcrop = im[s,:,:]
             imcrop = cv.cvtColor(imcrop,cv.COLOR_GRAY2BGR)
-            dst = overlayMask(imcrop,ret)
+            dst = overlayMask(imcrop,image)
             plt.title("cnn_12ply_{}".format(s))
             plt.imshow(dst)
             plt.show()

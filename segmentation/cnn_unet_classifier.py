@@ -15,7 +15,7 @@ def splitfn(fn):
 TRAIN = False
 LOAD = True
 APPLY = True
-input_height,input_width = 128,128
+input_height,input_width = 304,384
 n_classes = 3
 epochs = 5
 ckpath = "checkpoints/unet"
@@ -44,7 +44,7 @@ if TRAIN:
 
 inp_dir="./12ply/"
 out_dir="./outputs/"
-regex = inp_dir + "adept12ply_raw_????_?_?.png"
+regex = inp_dir + "adept12ply_raw_????.png"
 imgpaths = sorted(glob(regex))
 
 ### Apply network to target imgs
@@ -57,7 +57,7 @@ if APPLY:
             colors=[(0,0,255),(0,255,0),(255,0,0)]
         )
         lname = name.split('_')
-        if lname[-1]=='0' and lname[-2]=='0':
+        if int(lname[-1])%10=='0':
             print(name)
 
 ##predict_multiple(
