@@ -9,6 +9,7 @@ from template_method import findBlobs
 from gettemps import GetTemplates
 
 folder = "./"
+
 prefix = "A1-10mil-57um"
 r1,r2 = 30,406
 minDist = 6
@@ -16,6 +17,7 @@ eps=0.35
 minArea=50
 maxArea=150
 threshold=140
+resolution = 57
 
 ##prefix = "ILPreTest-40um-mid"
 ##r1,r2 = 61,240
@@ -24,6 +26,7 @@ threshold=140
 ##minArea=150
 ##maxArea=500
 ##threshold=90
+##resolution = 40
 
 ##prefix = "RLPreTest-40um-mid"
 ##r1,r2 = 162,305
@@ -32,6 +35,7 @@ threshold=140
 ##minArea=90
 ##maxArea=160
 ##threshold=90
+##resolution = 40
 
 fnames = folder + prefix + ".JPG"  # default
 paths = glob(fnames)
@@ -99,12 +103,12 @@ ret,fitImg = gt.getTowDimensions(plot=True,minArea=minArea,maxArea=maxArea,
                                  threshold=threshold)
 plt.title("Ellipse fits")
 
-minoraxis,majoraxis = ret[:,0],ret[:,1]
+minoraxis,majoraxis = ret[:,0]*resolution,ret[:,1]*resolution
 angle = ret[:,2]-90
 ax1 = plt.subplot(246)
 plt.hist(angle)
 print("ellipse angle (deg): ",np.mean(angle))
-print("ellipse angle stdev (px): ",np.std(angle))
+print("ellipse angle stdev (deg): ",np.std(angle))
 ax1.annotate("mean %.1f\nstdev %.1f"%(np.mean(angle),np.std(angle)),
             xy=(.2, .1),  xycoords='axes fraction',
             xytext=(0.8, 0.95), textcoords='axes fraction',
@@ -113,24 +117,24 @@ ax1.annotate("mean %.1f\nstdev %.1f"%(np.mean(angle),np.std(angle)),
 plt.title("Angle from horizontal (deg)")
 ax2 = plt.subplot(247)
 plt.hist(majoraxis)
-print("Major axis mean (px): ",np.mean(majoraxis))
-print("Major axis stdev (px): ",np.std(majoraxis))
+print("Major axis mean (um): ",np.mean(majoraxis))
+print("Major axis stdev (um): ",np.std(majoraxis))
 ax2.annotate("mean %.1f\nstdev %.1f"%(np.mean(majoraxis),np.std(majoraxis)),
             xy=(.2, .1),  xycoords='axes fraction',
             xytext=(0.8, 0.95), textcoords='axes fraction',
             horizontalalignment='right', verticalalignment='top',
             )
-plt.title("Tow Major Axis (px)")
+plt.title("Tow Major Axis (um)")
 ax3 = plt.subplot(248)
 plt.hist(minoraxis)
-print("Minor axis mean (px): ",np.mean(minoraxis))
-print("Minor axis stdev (px): ",np.std(minoraxis))
+print("Minor axis mean (um): ",np.mean(minoraxis))
+print("Minor axis stdev (um): ",np.std(minoraxis))
 ax3.annotate("mean %.1f\nstdev %.1f"%(np.mean(minoraxis),np.std(minoraxis)),
             xy=(.2, .1),  xycoords='axes fraction',
             xytext=(0.8, 0.95), textcoords='axes fraction',
             horizontalalignment='right', verticalalignment='top',
             )
-plt.title("Tow Minor Axis (px)")
+plt.title("Tow Minor Axis (um)")
 
 # ##################################################################
 # Compute DBSCAN, get labels
@@ -151,12 +155,12 @@ for cluster in range(0,n):
     c = final[cluster]
     for i in range(1,len(c)):
         vdist.append(abs(c[i][1]-c[i-1][1]))
-vdist = np.array(vdist)
-print("Vdist mean (px): ",np.mean(vdist))
-print("Vdist stdev (px): ",np.std(vdist))
+vdist = np.array(vdist)*resolution
+print("Vdist mean (um): ",np.mean(vdist))
+print("Vdist stdev (um): ",np.std(vdist))
 ax6 = plt.subplot(243)
-plt.hist(vdist,bins=range(min(vdist),max(vdist)+1 ))
-plt.title("Vertical spacing (px)")
+plt.hist(vdist)
+plt.title("Vertical spacing (um)")
 ax6.annotate("mean %.1f\nstdev %.1f"%(np.mean(vdist),np.std(vdist)),
             xy=(.2, .1),  xycoords='axes fraction',
             xytext=(0.5, 0.95), textcoords='axes fraction',
@@ -179,12 +183,12 @@ for cluster in range(1,n):
         ind = np.argmin(vdiff)
         hdist.append(abs(sc[i][0]-bc[ind][0]))
         
-hdist = np.array(hdist)
-print("Hdist mean (px): ",np.mean(hdist))
-print("Hdist stdev (px): ",np.std(hdist))
+hdist = np.array(hdist)*resolution
+print("Hdist mean (um): ",np.mean(hdist))
+print("Hdist stdev (um): ",np.std(hdist))
 ax7 = plt.subplot(244)
-plt.hist(hdist,bins=range(min(hdist),max(hdist)+1 ))
-plt.title("Horizontal spacing (px)")
+plt.hist(hdist)
+plt.title("Horizontal spacing (um)")
 ax7.annotate("mean %.1f\nstdev %.1f"%(np.mean(hdist),np.std(hdist)),
             xy=(.2, .1),  xycoords='axes fraction',
             xytext=(0.5, 0.95), textcoords='axes fraction',
